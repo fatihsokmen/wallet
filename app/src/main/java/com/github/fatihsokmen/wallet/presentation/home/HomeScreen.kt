@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -366,18 +367,22 @@ fun CurrencyList(
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Black,
         )
-        Column {
-            Currency.entries.forEach {
+        val currencies = Currency.entries
+        LazyColumn {
+            items(currencies.size) {
+                val currency = currencies[it]
                 CurrencyItem(
-                    displayName = it.displayName,
-                    code = it.name,
-                    flag = it.flag,
-                    selected = current == it,
+                    displayName = currency.displayName,
+                    code = currency.name,
+                    flag = currency.flag,
+                    selected = current == currency,
                     onNewCurrency = onNewCurrency,
                     onDismiss = onDismiss
                 )
             }
-            CurrencyInfo()
+            item {
+                CurrencyInfo()
+            }
         }
     }
 }
