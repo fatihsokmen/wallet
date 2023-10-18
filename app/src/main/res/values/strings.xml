@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Deblock Wallet</string>
+
+    <string name="home_send_button_label">Send %1$ of ETH</string>
+    <string name="home_title_send_ethereum">Send Ethereum</string>
+    <string name="home_exchange_est_network_fees_eth">Est. Network fees: ~ %1$s ETH</string>
+    <string name="home_currency_input_empty_value">0</string>
+    <string name="home_wallet_balance_eth">Max %1$s ETH</string>
+    <string name="home_currency_flag">Currency</string>
+    <string name="home_currency_select">Select</string>
+    <string name="home_bottom_shet_displayed_currencies">Displayed Currencies</string>
+    <string name="home_bottom_sheet_info">The currency is for information only. You\'re still sending ETH</string>
+</resources>
+
