@@ -56,6 +56,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -141,7 +142,7 @@ fun HomeContent(
             .then(modifier)
     ) {
         Spacer(
-            modifier = Modifier.height(48.dp)
+            modifier = Modifier.height(dimensionResource(id = R.dimen.home_title_top_padding))
         )
         Text(
             modifier = Modifier
@@ -151,13 +152,13 @@ fun HomeContent(
             style = MaterialTheme.typography.displaySmall
         )
         Spacer(
-            modifier = Modifier.height(32.dp)
+            modifier = Modifier.height(dimensionResource(id = R.dimen.home_title_bottom_padding))
         )
         CurrencyTextField(
             modifier = Modifier
                 .fillMaxWidth(fraction = 0.85f)
                 .align(Alignment.CenterHorizontally)
-                .height(116.dp),
+                .height(dimensionResource(id = R.dimen.home_input_height)),
             ethAmount = ethAmount,
             currency = currency,
             walletBalance = walletBalance,
@@ -286,6 +287,7 @@ private fun CurrencyTextField(
                     var inputAmountState by rememberSaveable { mutableStateOf("") }
                     BasicTextField(
                         value = inputAmountState,
+                        singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         textStyle = MaterialTheme.typography.headlineMedium,
                         onValueChange = {

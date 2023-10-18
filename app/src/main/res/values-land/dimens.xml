@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="home_title_top_padding">16dp</dimen>
+    <dimen name="home_title_bottom_padding">16dp</dimen>
+    <dimen name="home_input_height">96dp</dimen>
+</resources>
