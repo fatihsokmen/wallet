@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Deblock Wallet</string>
 
-    <string name="home_send_button_label">Send %1$ of ETH</string>
+    <string name="home_send_button_label">Send %1$s of ETH</string>
     <string name="home_title_send_ethereum">Send Ethereum</string>
     <string name="home_exchange_est_network_fees_eth">Est. Network fees: ~ %1$s ETH</string>
     <string name="home_currency_input_empty_value">0</string>
