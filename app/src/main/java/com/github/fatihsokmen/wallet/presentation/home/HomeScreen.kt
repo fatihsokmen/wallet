@@ -135,11 +135,13 @@ fun HomeContent(
     onRotate: (ExchangeMode) -> Unit
 ) {
     Column(
-        Modifier
+        modifier = Modifier
             .fillMaxSize()
             .then(modifier)
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(
+            modifier = Modifier.height(48.dp)
+        )
         Text(
             modifier = Modifier
                 .fillMaxWidth(fraction = 0.85f)
@@ -147,7 +149,9 @@ fun HomeContent(
             text = stringResource(R.string.home_title_send_ethereum),
             style = MaterialTheme.typography.displaySmall
         )
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(
+            modifier = Modifier.height(32.dp)
+        )
         CurrencyTextField(
             modifier = Modifier
                 .fillMaxWidth(fraction = 0.85f)
@@ -161,7 +165,9 @@ fun HomeContent(
             onOpenCurrencySelector = onOpenCurrencySelector,
             onRotate = onRotate
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
         Text(
             modifier = Modifier
                 .fillMaxWidth(fraction = 0.70f)
@@ -169,7 +175,9 @@ fun HomeContent(
             text = stringResource(R.string.home_exchange_est_network_fees_eth, ethGasFee),
             style = MaterialTheme.typography.labelLarge
         )
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(
+            modifier = Modifier.weight(1f)
+        )
         Button(
             enabled = buttonEnabled,
             modifier = Modifier
@@ -180,9 +188,14 @@ fun HomeContent(
             onClick = { /*TODO*/ },
             colors = ButtonDefaults.buttonColors(Color.Black)
         ) {
-            Text(text = buttonLabel, style = MaterialTheme.typography.titleLarge)
+            Text(
+                text = buttonLabel,
+                style = MaterialTheme.typography.titleLarge
+            )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
     }
 }
 
@@ -252,15 +265,23 @@ private fun CurrencyTextField(
                     )
                 }
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(
+                modifier = Modifier.width(16.dp)
+            )
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f)
             ) {
-                Row(Modifier.align(Alignment.CenterStart)) {
-                    Text(text = currency.symbol, style = MaterialTheme.typography.headlineMedium)
-                    Spacer(modifier = Modifier.width(4.dp))
+                Row(
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Text(
+                        text = currency.symbol, style = MaterialTheme.typography.headlineMedium
+                    )
+                    Spacer(
+                        modifier = Modifier.width(4.dp)
+                    )
                     var inputAmountState by rememberSaveable { mutableStateOf("") }
                     BasicTextField(
                         value = inputAmountState,
@@ -287,10 +308,11 @@ private fun CurrencyTextField(
                     color = Color.Gray.copy(alpha = 0.6f),
                 )
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(
+                modifier = Modifier.width(16.dp)
+            )
             Box(
-                modifier = Modifier
-                    .fillMaxHeight()
+                modifier = Modifier.fillMaxHeight()
             ) {
                 Text(
                     modifier = Modifier.align(Alignment.TopStart),
@@ -317,7 +339,7 @@ private fun CurrencyTextField(
                             contentDescription = stringResource(R.string.home_currency_select),
                             Modifier.size(InputChipDefaults.AvatarSize)
                         )
-                    },
+                    }
                 )
             }
         }
@@ -336,13 +358,13 @@ fun CurrencyList(
             .padding(16.dp)
     ) {
         Text(
-            text = stringResource(R.string.home_bottom_shet_displayed_currencies),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Black,
             modifier = Modifier.padding(
                 horizontal = 8.dp,
                 vertical = 16.dp,
-            )
+            ),
+            text = stringResource(R.string.home_bottom_shet_displayed_currencies),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Black,
         )
         Column {
             Currency.entries.forEach {
@@ -421,7 +443,9 @@ fun CurrencyInfo() {
             containerColor = Color.White
         )
     ) {
-        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp)) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp)
+        ) {
             Icon(
                 Icons.Filled.Info, "menu", modifier = Modifier.align(Alignment.CenterVertically)
             )
