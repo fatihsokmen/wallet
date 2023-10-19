@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
 package com.github.fatihsokmen.wallet.presentation.home
 
@@ -78,11 +78,12 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle(
         UiState.Success(
+            userInput = BigDecimal.ZERO.toString(),
             ethAmount = BigDecimal.ZERO,
             ethGasFee = BigDecimal.ZERO,
             currency = Currency.USD,
-            exchange = ExchangeMode.FIAT_TO_ETH,
-            insufficientBalance = false
+            inputMode = InputMode.FIAT_TO_ETH,
+            sendEnabled = false
         )
     )
 
@@ -107,13 +108,21 @@ fun HomeScreen(
             ethAmount = uiState.ethAmount,
             ethGasFee = uiState.ethGasFee,
             currency = uiState.currency,
-            buttonLabel = stringResource(
-                R.string.home_send_button_label,
-                "${uiState.currency.symbol}${uiState.ethAmount}"
-            ),
-            buttonEnabled = uiState.insufficientBalance.not(),
+            buttonLabel = if (uiState.inputMode == InputMode.FIAT_TO_ETH) {
+                stringResource(
+                    R.string.home_send_button_fiat_label,
+                    uiState.currency.symbol,
+                    uiState.ethAmount
+                )
+            } else {
+                stringResource(
+                    R.string.home_send_button_eth_label,
+                    uiState.userInput
+                )
+            },
+            buttonEnabled = uiState.sendEnabled,
             walletBalance = HomeViewModel.WALLET_ETH_BALANCE,
-            exchangeMode = uiState.exchange,
+            inputMode = uiState.inputMode,
             onInputAmountChanged = viewModel::onNewAmount,
             onOpenCurrencySelector = { scope.launch { sheetState.expand() } },
             onRotate = viewModel::onSwitchInputModel
@@ -130,10 +139,10 @@ fun HomeContent(
     buttonLabel: String,
     buttonEnabled: Boolean,
     walletBalance: BigDecimal,
-    exchangeMode: ExchangeMode,
+    inputMode: InputMode,
     onInputAmountChanged: (String) -> Unit,
     onOpenCurrencySelector: () -> Unit,
-    onRotate: (ExchangeMode) -> Unit
+    onRotate: (InputMode) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -161,7 +170,7 @@ fun HomeContent(
             ethAmount = ethAmount,
             currency = currency,
             walletBalance = walletBalance,
-            exchangeMode = exchangeMode,
+            inputMode = inputMode,
             onInputAmountChanged = onInputAmountChanged,
             onOpenCurrencySelector = onOpenCurrencySelector,
             onRotate = onRotate
@@ -206,10 +215,10 @@ private fun CurrencyTextField(
     ethAmount: BigDecimal,
     currency: Currency,
     walletBalance: BigDecimal,
-    exchangeMode: ExchangeMode,
+    inputMode: InputMode,
     onInputAmountChanged: (String) -> Unit,
     onOpenCurrencySelector: () -> Unit,
-    onRotate: (ExchangeMode) -> Unit
+    onRotate: (InputMode) -> Unit
 ) {
     CurrencyFrame(
         modifier = modifier,
@@ -247,14 +256,14 @@ private fun CurrencyTextField(
                         .background(Color.White)
                         .align(alignment = Alignment.CenterVertically),
                     onClick = {
-                        val (target, exchange) = if (rotation.value == 0f) {
-                            Pair(180f, ExchangeMode.ETH_TO_FIAT)
+                        val (target, mode) = if (rotation.value == 0f) {
+                            Pair(180f, InputMode.ETH_ONLY)
                         } else {
-                            Pair(0f, ExchangeMode.FIAT_TO_ETH)
+                            Pair(0f, InputMode.FIAT_TO_ETH)
                         }
                         coroutineScope.launch {
                             rotation.animateTo(target)
-                            onRotate(exchange)
+                            onRotate(mode)
                         }
                     },
                 ) {
@@ -277,7 +286,7 @@ private fun CurrencyTextField(
                 Row(
                     modifier = Modifier.align(Alignment.CenterStart)
                 ) {
-                    val symbol = if (exchangeMode == ExchangeMode.FIAT_TO_ETH) {
+                    val symbol = if (inputMode == InputMode.FIAT_TO_ETH) {
                         currency.symbol
                     } else {
                         stringResource(R.string.home_input_symbol)
@@ -310,7 +319,7 @@ private fun CurrencyTextField(
                         }
                     )
                 }
-                if (exchangeMode == ExchangeMode.FIAT_TO_ETH) {
+                if (inputMode.isFiatToEth()) {
                     Text(
                         modifier = Modifier.align(Alignment.BottomStart),
                         text = stringResource(
@@ -333,7 +342,7 @@ private fun CurrencyTextField(
                     color = Color.Blue,
                     style = MaterialTheme.typography.labelLarge
                 )
-                if (exchangeMode == ExchangeMode.FIAT_TO_ETH) {
+                if (inputMode.isFiatToEth()) {
                     InputChip(
                         modifier = Modifier.align(Alignment.CenterStart),
                         selected = false,

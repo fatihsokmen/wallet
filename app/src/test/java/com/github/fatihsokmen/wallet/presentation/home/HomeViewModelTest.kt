@@ -40,11 +40,12 @@ class HomeViewModelTest {
             subject.uiState.test {
                 val uiState = awaitItem()
                 uiState shouldBe UiState.Success(
+                    userInput = "0",
                     ethAmount = BigDecimal.ZERO,
                     ethGasFee = BigDecimal("0.01"),
                     currency = Currency.USD,
-                    exchange = ExchangeMode.FIAT_TO_ETH,
-                    insufficientBalance = false
+                    inputMode = InputMode.FIAT_TO_ETH,
+                    sendEnabled = false
                 )
             }
         }
@@ -67,17 +68,18 @@ class HomeViewModelTest {
             subject.uiState.test {
                 val uiState = awaitItem()
                 uiState shouldBe UiState.Success(
+                    userInput = "1000",
                     ethAmount = BigDecimal("0.6"),
                     ethGasFee = BigDecimal("0.02"),
                     currency = Currency.USD,
-                    exchange = ExchangeMode.FIAT_TO_ETH,
-                    insufficientBalance = false
+                    inputMode = InputMode.FIAT_TO_ETH,
+                    sendEnabled = true
                 )
             }
         }
 
     @Test
-    fun GIVEN_eth_price_and_gas_fee_WHEN_eth_bigger_than_balance_THEN_insufficient_balance() =
+    fun GIVEN_eth_price_and_gas_fee_WHEN_eth_bigger_than_balance_THEN_send_disabled() =
         runTest() {
             // GIVEN
             givenEthereumPrice(Currency.USD, price = BigDecimal(100000), eth = BigDecimal("75"))
@@ -94,11 +96,40 @@ class HomeViewModelTest {
             subject.uiState.test {
                 val uiState = awaitItem()
                 uiState shouldBe UiState.Success(
+                    userInput = "100000",
                     ethAmount = BigDecimal("75"),
                     ethGasFee = BigDecimal("0.06"),
                     currency = Currency.USD,
-                    exchange = ExchangeMode.FIAT_TO_ETH,
-                    insufficientBalance = true
+                    inputMode = InputMode.FIAT_TO_ETH,
+                    sendEnabled = false
+                )
+            }
+        }
+
+    @Test
+    fun GIVEN_eth_only_mode_WHEN_amount_bigger_than_wallet_balance_THEN_send_disabled() =
+        runTest {
+            // GIVEN
+            givenGasFee(gas = BigDecimal("0.06"))
+
+            // WHEN
+            val subject = HomeViewModel(
+                calculateEthereumAmountUseCase,
+                calculateEthereumGasFee
+            )
+            subject.onSwitchInputModel(InputMode.ETH_ONLY)
+            subject.onNewAmount("11")
+
+            // THEN
+            subject.uiState.test {
+                val uiState = awaitItem()
+                uiState shouldBe UiState.Success(
+                    userInput = "11",
+                    ethAmount = BigDecimal("11"),
+                    ethGasFee = BigDecimal("0.06"),
+                    currency = Currency.USD,
+                    inputMode = InputMode.ETH_ONLY,
+                    sendEnabled = false
                 )
             }
         }
@@ -122,11 +153,12 @@ class HomeViewModelTest {
             subject.uiState.test {
                 val uiState = awaitItem()
                 uiState shouldBe UiState.Success(
+                    userInput = "1000",
                     ethAmount = BigDecimal("0.7"),
                     ethGasFee = BigDecimal("0.06"),
                     currency = Currency.GBP,
-                    exchange = ExchangeMode.FIAT_TO_ETH,
-                    insufficientBalance = false
+                    inputMode = InputMode.FIAT_TO_ETH,
+                    sendEnabled = true
                 )
             }
         }

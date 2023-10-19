@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.shareIn
 import java.math.BigDecimal
 import javax.inject.Inject
@@ -27,7 +28,7 @@ class HomeViewModel @Inject constructor(
 
     private val inputAmount = MutableStateFlow("0")
     private val inputCurrency = MutableStateFlow(Currency.USD)
-    private val inputExchangeMode = MutableStateFlow(ExchangeMode.FIAT_TO_ETH)
+    private val inputMode = MutableStateFlow(InputMode.FIAT_TO_ETH)
 
     /**
      * We define inputs above and combine them to produce latest screen state
@@ -35,12 +36,12 @@ class HomeViewModel @Inject constructor(
      * - inputCurrency: Currency selected on bottom sheet (default usd)
      */
     val uiState =
-        combine(inputAmount, inputCurrency, inputExchangeMode) { amount, currency, conversion ->
+        combine(inputAmount, inputCurrency, inputMode) { amount, currency, conversion ->
             val sanitisedAmount = (amount.toBigDecimalOrNull() ?: BigDecimal.ZERO).toString()
             UiInputs(
                 value = sanitisedAmount,
                 currencySelection = currency,
-                exchangeMode = conversion
+                inputMode = conversion
             )
         }
             // skip some keystrokes to avoid bunch multiple api calls
@@ -48,18 +49,26 @@ class HomeViewModel @Inject constructor(
             // We have now all inputs and ready to produce screen state
             .flatMapLatest { inputs ->
                 combine(
-                    calculateEthereumAmountUseCase.execute(
-                        inputs.currencySelection, BigDecimal(inputs.value)
-                    ),
+                    if (inputs.inputMode.isFiatToEth()) {
+                        calculateEthereumAmountUseCase.execute(
+                            inputs.currencySelection,
+                            BigDecimal(inputs.value)
+                        )
+                    } else {
+                        flowOf(inputs.value.toBigDecimalOrNull() ?: BigDecimal.ZERO)
+                    },
                     calculateEthereumGasFee.execute(),
-                    inputExchangeMode
-                ) { ethAmount, ethGasFee, exchangeMode ->
+                    inputMode,
+                    inputAmount
+                ) { ethAmount, ethGasFee, inputMode, userInput ->
+                    val sendEnabled = ethAmount > BigDecimal.ZERO && ethAmount <= WALLET_ETH_BALANCE
                     UiState.Success(
+                        userInput,
                         ethAmount,
                         ethGasFee,
                         inputs.currencySelection,
-                        inputs.exchangeMode,
-                        insufficientBalance = ethAmount > WALLET_ETH_BALANCE
+                        inputMode,
+                        sendEnabled = sendEnabled
                     )
                 }.catch {
                     UiState.Error(it.message.orEmpty())
@@ -80,8 +89,8 @@ class HomeViewModel @Inject constructor(
         inputCurrency.tryEmit(currency)
     }
 
-    fun onSwitchInputModel(newExchange: ExchangeMode) {
-        this.inputExchangeMode.tryEmit(newExchange)
+    fun onSwitchInputModel(newExchange: InputMode) {
+        this.inputMode.tryEmit(newExchange)
     }
 
     companion object {
@@ -91,27 +100,28 @@ class HomeViewModel @Inject constructor(
     }
 }
 
-enum class ExchangeMode {
+enum class InputMode {
     FIAT_TO_ETH,
-    ETH_TO_FIAT
+    ETH_ONLY
 }
 
-fun ExchangeMode.isFiatToEth() =
-    this == ExchangeMode.FIAT_TO_ETH
+fun InputMode.isFiatToEth() =
+    this == InputMode.FIAT_TO_ETH
 
 data class UiInputs(
     val value: String,
     val currencySelection: Currency,
-    val exchangeMode: ExchangeMode
+    val inputMode: InputMode
 )
 
 sealed class UiState {
     data class Success(
+        val userInput: String,
         val ethAmount: BigDecimal,
         val ethGasFee: BigDecimal,
         val currency: Currency,
-        val exchange: ExchangeMode,
-        val insufficientBalance: Boolean
+        val inputMode: InputMode,
+        val sendEnabled: Boolean
     ) : UiState()
 
     data class Error(val message: String) : UiState()
