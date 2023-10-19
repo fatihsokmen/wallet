@@ -10,5 +10,6 @@
     <string name="home_currency_select">Select</string>
     <string name="home_bottom_shet_displayed_currencies">Displayed Currencies</string>
     <string name="home_bottom_sheet_info">The currency is for information only. You\'re still sending ETH</string>
+    <string name="home_exchange_conversion_eth_text">%1$s ETH</string>
 </resources>
 

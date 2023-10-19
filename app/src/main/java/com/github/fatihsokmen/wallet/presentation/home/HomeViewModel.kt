@@ -54,18 +54,12 @@ class HomeViewModel @Inject constructor(
                     calculateEthereumGasFee.execute(),
                     inputExchangeMode
                 ) { ethAmount, ethGasFee, exchangeMode ->
-                    val exchangeDisplay = if (exchangeMode.isFiatToEth()) {
-                        "${ethAmount} ETH"
-                    } else {
-                        "${inputs.currencySelection.symbol}${ethAmount}"
-                    }
                     UiState.Success(
                         ethAmount,
                         ethGasFee,
                         inputs.currencySelection,
                         inputs.exchangeMode,
-                        exchangeDisplay,
-                        insufficientBalance = ethAmount > WALLET_ETH_BALANCE || ethAmount <= BigDecimal.ZERO
+                        insufficientBalance = ethAmount > WALLET_ETH_BALANCE
                     )
                 }.catch {
                     UiState.Error(it.message.orEmpty())
@@ -117,7 +111,6 @@ sealed class UiState {
         val ethGasFee: BigDecimal,
         val currency: Currency,
         val exchange: ExchangeMode,
-        val exchangeDisplay: String,
         val insufficientBalance: Boolean
     ) : UiState()
 

@@ -82,7 +82,6 @@ fun HomeScreen(
             ethGasFee = BigDecimal.ZERO,
             currency = Currency.USD,
             exchange = ExchangeMode.FIAT_TO_ETH,
-            "0 ETH",
             insufficientBalance = false
         )
     )
@@ -114,7 +113,6 @@ fun HomeScreen(
             ),
             buttonEnabled = uiState.insufficientBalance.not(),
             walletBalance = HomeViewModel.WALLET_ETH_BALANCE,
-            exchangeDisplay = uiState.exchangeDisplay,
             onInputAmountChanged = viewModel::onNewAmount,
             onOpenCurrencySelector = { scope.launch { sheetState.expand() } },
             onRotate = viewModel::onRotate
@@ -131,7 +129,6 @@ fun HomeContent(
     buttonLabel: String,
     buttonEnabled: Boolean,
     walletBalance: BigDecimal,
-    exchangeDisplay: String,
     onInputAmountChanged: (String) -> Unit,
     onOpenCurrencySelector: () -> Unit,
     onRotate: (ExchangeMode) -> Unit
@@ -162,7 +159,6 @@ fun HomeContent(
             ethAmount = ethAmount,
             currency = currency,
             walletBalance = walletBalance,
-            exchangeDisplay = exchangeDisplay,
             onInputAmountChanged = onInputAmountChanged,
             onOpenCurrencySelector = onOpenCurrencySelector,
             onRotate = onRotate
@@ -207,7 +203,6 @@ private fun CurrencyTextField(
     ethAmount: BigDecimal,
     currency: Currency,
     walletBalance: BigDecimal,
-    exchangeDisplay: String,
     onInputAmountChanged: (String) -> Unit,
     onOpenCurrencySelector: () -> Unit,
     onRotate: (ExchangeMode) -> Unit
@@ -307,7 +302,7 @@ private fun CurrencyTextField(
                 }
                 Text(
                     modifier = Modifier.align(Alignment.BottomStart),
-                    text = exchangeDisplay,
+                    text = stringResource(R.string.home_exchange_conversion_eth_text, ethAmount),
                     color = Color.Gray.copy(alpha = 0.6f),
                 )
             }

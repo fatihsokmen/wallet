@@ -87,11 +87,16 @@ dependencies {
 
 
     // Android Test
-    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
+
+    androidTestImplementation("io.mockk:mockk:1.12.8")
+    androidTestImplementation("app.cash.turbine:turbine:1.0.0")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    androidTestImplementation("io.kotest:kotest-assertions-core:5.7.2")
+
 
 }
 
