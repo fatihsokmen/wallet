@@ -30,11 +30,9 @@ class CalculateEthereumAmountInFiatCurrencyUseCaseTest(
                 ethereumPriceRepository.getEthereumPriceIn(currency)
             } returns flowOf(ethPriceInCurrency)
 
-            val dispatcher = StandardTestDispatcher(testScheduler)
             val subject =
                 CalculateEthereumAmountInFiatCurrencyUseCase(
-                    ethereumPriceRepository,
-                    dispatcher
+                    ethereumPriceRepository
                 )
 
             subject.execute(currency = currency, amount = amount).test {

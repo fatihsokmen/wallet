@@ -6,7 +6,6 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,11 +21,10 @@ class CalculateEthereumGasFeeUseCaseTest(
     private val ethereumPriceRepository: EthereumPriceRepository = mockk(relaxed = true)
 
     @Test
-    fun `GIVEN currency and amount WHEN executed THEN should calculate eth amount in currency`() =
+    fun `GIVEN use case WHEN executed THEN should calculate gas fee in eth`() =
         runTest {
             every { ethereumPriceRepository.getGasFee() } returns flowOf(Result.success(fastGasFee))
-            val dispatcher = StandardTestDispatcher(testScheduler)
-            val subject = CalculateEthereumGasFeeUseCase(ethereumPriceRepository, dispatcher)
+            val subject = CalculateEthereumGasFeeUseCase(ethereumPriceRepository)
 
             subject.execute().test {
                 awaitItem() shouldBe expectedEthGasFee
