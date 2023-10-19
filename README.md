@@ -1,5 +1,9 @@
 # Deblock Wallet
 
+## Tools / Env.
+
+Android Studio Iguana | 2023.2.1 Canary 7 (on Apple M1 Chip)
+Gradle 8.0
 
 ## Things to improve/consider 
 
