@@ -25,7 +25,7 @@ class CalculateEthereumAmountInFiatCurrencyUseCase @Inject constructor(
     fun execute(currency: Currency, amount: BigDecimal) =
         ethereumPriceRepository.getEthereumPriceIn(currency)
             .map {
-                amount.divide(it, 3, RoundingMode.HALF_UP).stripTrailingZeros()
+                amount.divide(it, 3, RoundingMode.HALF_UP).setScale(3).stripTrailingZeros()
             }
             .flowOn(dispatcher)
 }

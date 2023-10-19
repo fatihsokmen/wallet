@@ -3,7 +3,6 @@ package com.github.fatihsokmen.wallet
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,17 +51,11 @@ class WalletAppState(
         isOnline = checkIfOnline()
     }
 
-    @Suppress("DEPRECATION")
     private fun checkIfOnline(): Boolean {
-        val cm = ContextCompat.getSystemService(context, ConnectivityManager::class.java)
-
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val capabilities = cm?.getNetworkCapabilities(cm.activeNetwork) ?: return false
-            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-                    capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-        } else {
-            cm?.activeNetworkInfo?.isConnectedOrConnecting == true
-        }
+        val manager = ContextCompat.getSystemService(context, ConnectivityManager::class.java)
+        val capabilities = manager?.getNetworkCapabilities(manager.activeNetwork) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     }
 }
 

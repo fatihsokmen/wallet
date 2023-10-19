@@ -80,6 +80,11 @@ dependencies {
 
     // Unit Test
     testImplementation(libs.ui.test.junit4)
+    testImplementation("io.mockk:mockk:1.12.8")
+    testImplementation("app.cash.turbine:turbine:1.0.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("io.kotest:kotest-assertions-core:5.7.2")
+
 
     // Android Test
     testImplementation(libs.junit)
