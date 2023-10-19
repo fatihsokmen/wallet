@@ -1,8 +1,12 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+    ExperimentalAnimationApi::class
+)
 
 package com.github.fatihsokmen.wallet.presentation.home
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -39,6 +43,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -52,6 +57,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
@@ -77,7 +83,7 @@ fun HomeScreen(
     scope: CoroutineScope = rememberCoroutineScope()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle(
-        UiState.Success(
+        UiState(
             userInput = BigDecimal.ZERO.toString(),
             ethAmount = BigDecimal.ZERO,
             ethGasFee = BigDecimal.ZERO,
@@ -125,7 +131,19 @@ fun HomeScreen(
             inputMode = uiState.inputMode,
             onInputAmountChanged = viewModel::onNewAmount,
             onOpenCurrencySelector = { scope.launch { sheetState.expand() } },
-            onRotate = viewModel::onSwitchInputModel
+            onRotate = viewModel::onSwitchInputModel,
+            snackbar = {
+                val errorState by viewModel.errorState
+                if (errorState.isNotBlank()) {
+                    Snackbar(
+                        action = {
+                            Button(onClick = { viewModel.clearError() }) {
+                                Text(stringResource(id = android.R.string.ok))
+                            }
+                        },
+                    ) { Text(text = errorState) }
+                }
+            }
         )
     }
 }
@@ -142,7 +160,8 @@ fun HomeContent(
     inputMode: InputMode,
     onInputAmountChanged: (String) -> Unit,
     onOpenCurrencySelector: () -> Unit,
-    onRotate: (InputMode) -> Unit
+    onRotate: (InputMode) -> Unit,
+    snackbar: @Composable () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -206,6 +225,7 @@ fun HomeContent(
         Spacer(
             modifier = Modifier.height(16.dp)
         )
+        snackbar()
     }
 }
 

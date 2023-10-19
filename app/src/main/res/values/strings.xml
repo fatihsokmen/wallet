@@ -13,5 +13,7 @@
     <string name="home_bottom_sheet_info">The currency is for information only. You\'re still sending ETH</string>
     <string name="home_exchange_conversion_eth_text">%1$s ETH</string>
     <string name="home_input_symbol">ETH</string>
+    <string name="home_error_internet_connection">Please check your connection</string>
+    <string name="home_error_generic">An error occurred</string>
 </resources>
 
