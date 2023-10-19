@@ -113,9 +113,10 @@ fun HomeScreen(
             ),
             buttonEnabled = uiState.insufficientBalance.not(),
             walletBalance = HomeViewModel.WALLET_ETH_BALANCE,
+            exchangeMode = uiState.exchange,
             onInputAmountChanged = viewModel::onNewAmount,
             onOpenCurrencySelector = { scope.launch { sheetState.expand() } },
-            onRotate = viewModel::onRotate
+            onRotate = viewModel::onSwitchInputModel
         )
     }
 }
@@ -129,6 +130,7 @@ fun HomeContent(
     buttonLabel: String,
     buttonEnabled: Boolean,
     walletBalance: BigDecimal,
+    exchangeMode: ExchangeMode,
     onInputAmountChanged: (String) -> Unit,
     onOpenCurrencySelector: () -> Unit,
     onRotate: (ExchangeMode) -> Unit
@@ -159,6 +161,7 @@ fun HomeContent(
             ethAmount = ethAmount,
             currency = currency,
             walletBalance = walletBalance,
+            exchangeMode = exchangeMode,
             onInputAmountChanged = onInputAmountChanged,
             onOpenCurrencySelector = onOpenCurrencySelector,
             onRotate = onRotate
@@ -203,6 +206,7 @@ private fun CurrencyTextField(
     ethAmount: BigDecimal,
     currency: Currency,
     walletBalance: BigDecimal,
+    exchangeMode: ExchangeMode,
     onInputAmountChanged: (String) -> Unit,
     onOpenCurrencySelector: () -> Unit,
     onRotate: (ExchangeMode) -> Unit
@@ -273,14 +277,20 @@ private fun CurrencyTextField(
                 Row(
                     modifier = Modifier.align(Alignment.CenterStart)
                 ) {
+                    val symbol = if (exchangeMode == ExchangeMode.FIAT_TO_ETH) {
+                        currency.symbol
+                    } else {
+                        stringResource(R.string.home_input_symbol)
+                    }
                     Text(
-                        text = currency.symbol, style = MaterialTheme.typography.headlineMedium
+                        text = symbol, style = MaterialTheme.typography.headlineMedium
                     )
                     Spacer(
                         modifier = Modifier.width(4.dp)
                     )
                     var inputAmountState by rememberSaveable { mutableStateOf("") }
                     BasicTextField(
+                        modifier = Modifier.weight(1f),
                         value = inputAmountState,
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -300,11 +310,16 @@ private fun CurrencyTextField(
                         }
                     )
                 }
-                Text(
-                    modifier = Modifier.align(Alignment.BottomStart),
-                    text = stringResource(R.string.home_exchange_conversion_eth_text, ethAmount),
-                    color = Color.Gray.copy(alpha = 0.6f),
-                )
+                if (exchangeMode == ExchangeMode.FIAT_TO_ETH) {
+                    Text(
+                        modifier = Modifier.align(Alignment.BottomStart),
+                        text = stringResource(
+                            R.string.home_exchange_conversion_eth_text,
+                            ethAmount
+                        ),
+                        color = Color.Gray.copy(alpha = 0.6f),
+                    )
+                }
             }
             Spacer(
                 modifier = Modifier.width(16.dp)
@@ -318,27 +333,29 @@ private fun CurrencyTextField(
                     color = Color.Blue,
                     style = MaterialTheme.typography.labelLarge
                 )
-                InputChip(
-                    modifier = Modifier.align(Alignment.CenterStart),
-                    selected = false,
-                    onClick = onOpenCurrencySelector,
-                    border = null,
-                    label = { Text(text = currency.name.uppercase()) },
-                    avatar = {
-                        Image(
-                            painterResource(id = currency.flag),
-                            contentDescription = stringResource(R.string.home_currency_flag),
-                            Modifier.size(InputChipDefaults.AvatarSize)
-                        )
-                    },
-                    trailingIcon = {
-                        Icon(
-                            Icons.Default.KeyboardArrowDown,
-                            contentDescription = stringResource(R.string.home_currency_select),
-                            Modifier.size(InputChipDefaults.AvatarSize)
-                        )
-                    }
-                )
+                if (exchangeMode == ExchangeMode.FIAT_TO_ETH) {
+                    InputChip(
+                        modifier = Modifier.align(Alignment.CenterStart),
+                        selected = false,
+                        onClick = onOpenCurrencySelector,
+                        border = null,
+                        label = { Text(text = currency.name.uppercase()) },
+                        avatar = {
+                            Image(
+                                painterResource(id = currency.flag),
+                                contentDescription = stringResource(R.string.home_currency_flag),
+                                Modifier.size(InputChipDefaults.AvatarSize)
+                            )
+                        },
+                        trailingIcon = {
+                            Icon(
+                                Icons.Default.KeyboardArrowDown,
+                                contentDescription = stringResource(R.string.home_currency_select),
+                                Modifier.size(InputChipDefaults.AvatarSize)
+                            )
+                        }
+                    )
+                }
             }
         }
     }

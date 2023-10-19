@@ -80,7 +80,7 @@ class HomeViewModel @Inject constructor(
         inputCurrency.tryEmit(currency)
     }
 
-    fun onRotate(newExchange: ExchangeMode) {
+    fun onSwitchInputModel(newExchange: ExchangeMode) {
         this.inputExchangeMode.tryEmit(newExchange)
     }
 
