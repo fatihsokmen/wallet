@@ -1,6 +1,7 @@
 package com.github.fatihsokmen.wallet.presentation.home
 
 import app.cash.turbine.test
+import com.github.fatihsokmen.wallet.core.StringResources
 import com.github.fatihsokmen.wallet.domain.CalculateEthereumAmountInFiatCurrencyUseCase
 import com.github.fatihsokmen.wallet.domain.CalculateEthereumGasFeeUseCase
 import com.github.fatihsokmen.wallet.presentation.MainDispatcherRule
@@ -22,6 +23,7 @@ class HomeViewModelTest {
         mockk(relaxed = true)
     private val calculateEthereumGasFee: CalculateEthereumGasFeeUseCase =
         mockk(relaxed = true)
+    private val stringResource: StringResources = mockk(relaxed = true)
 
     @Test
     fun GIVEN_eth_price_and_gas_fee_WHEN_screen_launched_THEN_initial_state_should_be_produced() =
@@ -33,13 +35,14 @@ class HomeViewModelTest {
             // WHEN
             val subject = HomeViewModel(
                 calculateEthereumAmountUseCase,
-                calculateEthereumGasFee
+                calculateEthereumGasFee,
+                stringResource
             )
 
             // THEN
             subject.uiState.test {
                 val uiState = awaitItem()
-                uiState shouldBe UiState.Success(
+                uiState shouldBe UiState(
                     userInput = "0",
                     ethAmount = BigDecimal.ZERO,
                     ethGasFee = BigDecimal("0.01"),
@@ -60,14 +63,15 @@ class HomeViewModelTest {
             // WHEN
             val subject = HomeViewModel(
                 calculateEthereumAmountUseCase,
-                calculateEthereumGasFee
+                calculateEthereumGasFee,
+                stringResource
             )
             subject.onNewAmount("1000")
 
             // THEN
             subject.uiState.test {
                 val uiState = awaitItem()
-                uiState shouldBe UiState.Success(
+                uiState shouldBe UiState(
                     userInput = "1000",
                     ethAmount = BigDecimal("0.6"),
                     ethGasFee = BigDecimal("0.02"),
@@ -88,14 +92,15 @@ class HomeViewModelTest {
             // WHEN
             val subject = HomeViewModel(
                 calculateEthereumAmountUseCase,
-                calculateEthereumGasFee
+                calculateEthereumGasFee,
+                stringResource
             )
             subject.onNewAmount("100000")
 
             // THEN
             subject.uiState.test {
                 val uiState = awaitItem()
-                uiState shouldBe UiState.Success(
+                uiState shouldBe UiState(
                     userInput = "100000",
                     ethAmount = BigDecimal("75"),
                     ethGasFee = BigDecimal("0.06"),
@@ -115,7 +120,8 @@ class HomeViewModelTest {
             // WHEN
             val subject = HomeViewModel(
                 calculateEthereumAmountUseCase,
-                calculateEthereumGasFee
+                calculateEthereumGasFee,
+                stringResource
             )
             subject.onSwitchInputModel(InputMode.ETH_ONLY)
             subject.onNewAmount("11")
@@ -123,7 +129,7 @@ class HomeViewModelTest {
             // THEN
             subject.uiState.test {
                 val uiState = awaitItem()
-                uiState shouldBe UiState.Success(
+                uiState shouldBe UiState(
                     userInput = "11",
                     ethAmount = BigDecimal("11"),
                     ethGasFee = BigDecimal("0.06"),
@@ -144,7 +150,8 @@ class HomeViewModelTest {
             // WHEN
             val subject = HomeViewModel(
                 calculateEthereumAmountUseCase,
-                calculateEthereumGasFee
+                calculateEthereumGasFee,
+                stringResource
             )
             subject.onNewAmount("1000")
             subject.onNewFiat("GBP")
@@ -152,7 +159,7 @@ class HomeViewModelTest {
             // THEN
             subject.uiState.test {
                 val uiState = awaitItem()
-                uiState shouldBe UiState.Success(
+                uiState shouldBe UiState(
                     userInput = "1000",
                     ethAmount = BigDecimal("0.7"),
                     ethGasFee = BigDecimal("0.06"),
