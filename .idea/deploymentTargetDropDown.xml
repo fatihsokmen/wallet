@@ -2,6 +2,21 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="GIVEN_home_screen_WHEN_api_raises_exception_THEN_shows_a_snackbar()">
+        <State />
+      </entry>
+      <entry key="GIVEN_home_screen_WHEN_currency_chip_clicks_THEN_bottom_sheet_pops_up()">
+        <State />
+      </entry>
+      <entry key="GIVEN_home_screen_WHEN_currency_chip_clicks_euro_THEN_bottom_sheet_pops_up()">
+        <State />
+      </entry>
+      <entry key="HomeScreenTest">
+        <State />
+      </entry>
+      <entry key="Tests in 'com.github.fatihsokmen.wallet.presentation.home'">
+        <State />
+      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>

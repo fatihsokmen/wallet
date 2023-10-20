@@ -18,7 +18,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner =
+            "com.github.fatihsokmen.wallet.presentation.home.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -48,7 +49,7 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/*"
         }
     }
 }
@@ -80,24 +81,17 @@ dependencies {
 
     // Unit Test
     testImplementation(libs.ui.test.junit4)
-    testImplementation("io.mockk:mockk:1.12.8")
-    testImplementation("app.cash.turbine:turbine:1.0.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation("io.kotest:kotest-assertions-core:5.7.2")
-
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.coroutine.test)
+    testImplementation(libs.kotest.assertions)
 
     // Android Test
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.espresso.core)
-    androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
-
-    androidTestImplementation("io.mockk:mockk:1.12.8")
-    androidTestImplementation("app.cash.turbine:turbine:1.0.0")
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    androidTestImplementation("io.kotest:kotest-assertions-core:5.7.2")
-
-
+    androidTestImplementation(libs.hilt.android.testing)
+    androidTestAnnotationProcessor(libs.hilt.compiler)
+    kaptAndroidTest(libs.hilt.compiler)
+    androidTestImplementation(libs.test.runner)
 }
 
 kapt {

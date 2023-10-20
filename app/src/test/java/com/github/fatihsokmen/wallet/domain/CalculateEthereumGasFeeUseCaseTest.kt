@@ -24,7 +24,7 @@ class CalculateEthereumGasFeeUseCaseTest(
     fun `GIVEN use case WHEN executed THEN should calculate gas fee in eth`() =
         runTest {
             every { ethereumPriceRepository.getGasFee() } returns flowOf(Result.success(fastGasFee))
-            val subject = CalculateEthereumGasFeeUseCase(ethereumPriceRepository)
+            val subject = CalculateEthereumGasFeeUseCaseImpl(ethereumPriceRepository)
 
             subject.execute().test {
                 awaitItem() shouldBe expectedEthGasFee

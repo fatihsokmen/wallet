@@ -1,5 +1,6 @@
 [versions]
 agp = "8.3.0-alpha07"
+hilt-android-testing = "2.48.1"
 kotlin = "1.9.0"
 core-ktx = "1.12.0"
 core-navigation = "2.7.4"
@@ -14,7 +15,9 @@ compose-bom = "2023.08.00"
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 core-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "core-navigation" }
+hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt-android-testing" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+test-runner = { group = "androidx.test", name = "runner", version = "1.5.2"}
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
@@ -26,7 +29,7 @@ ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version = "1.5.4" }
 material3 = { group = "androidx.compose.material3", name = "material3" }
 hilt = { group = "com.google.dagger", name = "hilt-android", version = "2.48.1" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version = "2.48.1" }
@@ -35,6 +38,10 @@ retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version = "2.9
 retrofit-moshi = { group = "com.squareup.retrofit2", name = "converter-moshi", version = "2.4.0" }
 okhttp = { group = "com.squareup.okhttp", name = "okhttp", version = "2.7.5" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version = "4.11.0" }
+mockk = { group = "io.mockk", name = "mockk", version = "1.12.8" }
+turbine = { group = "app.cash.turbine", name = "turbine", version = "1.0.0" }
+coroutine-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.7.3" }
+kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version = "5.7.2"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

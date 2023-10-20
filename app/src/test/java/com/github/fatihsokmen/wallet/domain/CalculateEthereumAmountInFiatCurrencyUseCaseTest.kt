@@ -30,7 +30,7 @@ class CalculateEthereumAmountInFiatCurrencyUseCaseTest(
             } returns flowOf(ethPriceInCurrency)
 
             val subject =
-                CalculateEthereumAmountInFiatCurrencyUseCase(
+                CalculateEthereumAmountInFiatCurrencyUseCaseImpl(
                     ethereumPriceRepository
                 )
 

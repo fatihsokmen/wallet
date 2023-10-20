@@ -5,6 +5,11 @@
 - Android Studio Iguana | 2023.2.1 Canary 7 (on Apple M1 Chip)
 - Gradle 8.0
 
+## Tests
+
+- `./gradlew test`
+- `./gradlew connectedAndroidTest`
+
 ## Things to improve/consider 
 
 - Input field can be supported by `VisualTransformation`s that we can format/mask text value

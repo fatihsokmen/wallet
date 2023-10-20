@@ -1,6 +1,6 @@
 @file:OptIn(
     ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
-    ExperimentalAnimationApi::class
+    ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class
 )
 
 package com.github.fatihsokmen.wallet.presentation.home
@@ -57,11 +57,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -73,14 +73,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.fatihsokmen.wallet.R
 import com.github.fatihsokmen.wallet.presentation.home.model.Currency
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel(),
-    scope: CoroutineScope = rememberCoroutineScope()
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle(
         UiState(
@@ -97,6 +95,8 @@ fun HomeScreen(
         initialValue = SheetValue.Hidden,
         skipHiddenState = false
     )
+
+    val scope = rememberCoroutineScope()
 
     BottomSheetScaffold(
         modifier = Modifier.fillMaxHeight(),
@@ -136,6 +136,7 @@ fun HomeScreen(
                 val errorState by viewModel.errorState
                 if (errorState.isNotBlank()) {
                     Snackbar(
+                        modifier = Modifier.testTag("snackbar"),
                         action = {
                             Button(onClick = { viewModel.clearError() }) {
                                 Text(stringResource(id = android.R.string.ok))
@@ -274,6 +275,7 @@ private fun CurrencyTextField(
                     modifier = Modifier
                         .padding(0.dp)
                         .background(Color.White)
+                        .testTag("input-mode")
                         .align(alignment = Alignment.CenterVertically),
                     onClick = {
                         val (target, mode) = if (rotation.value == 0f) {
@@ -304,12 +306,12 @@ private fun CurrencyTextField(
                     .weight(1f)
             ) {
                 Row(
-                    modifier = Modifier.align(Alignment.CenterStart)
+                    modifier = Modifier.align(Alignment.CenterStart).testTag("currency-symbol")
                 ) {
                     val symbol = if (inputMode == InputMode.FIAT_TO_ETH) {
                         currency.symbol
                     } else {
-                        stringResource(R.string.home_input_symbol)
+                        stringResource(R.string.home_input_eth_symbol)
                     }
                     Text(
                         text = symbol, style = MaterialTheme.typography.headlineMedium
@@ -319,7 +321,9 @@ private fun CurrencyTextField(
                     )
                     var inputAmountState by rememberSaveable { mutableStateOf("") }
                     BasicTextField(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("user-input"),
                         value = inputAmountState,
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -341,7 +345,7 @@ private fun CurrencyTextField(
                 }
                 if (inputMode.isFiatToEth()) {
                     Text(
-                        modifier = Modifier.align(Alignment.BottomStart),
+                        modifier = Modifier.align(Alignment.BottomStart).testTag("exp-amount-text"),
                         text = stringResource(
                             R.string.home_exchange_conversion_eth_text,
                             ethAmount
@@ -364,7 +368,7 @@ private fun CurrencyTextField(
                 )
                 if (inputMode.isFiatToEth()) {
                     InputChip(
-                        modifier = Modifier.align(Alignment.CenterStart),
+                        modifier = Modifier.align(Alignment.CenterStart).testTag("currency-chip"),
                         selected = false,
                         onClick = onOpenCurrencySelector,
                         border = null,
@@ -415,6 +419,7 @@ fun CurrencyList(
             items(currencies.size) {
                 val currency = currencies[it]
                 CurrencyItem(
+                    modifier = Modifier.testTag("${currency.name}-option"),
                     displayName = currency.displayName,
                     code = currency.name,
                     flag = currency.flag,
@@ -432,6 +437,7 @@ fun CurrencyList(
 
 @Composable
 fun CurrencyItem(
+    modifier: Modifier,
     displayName: String,
     code: String,
     @DrawableRes flag: Int,
@@ -450,7 +456,7 @@ fun CurrencyItem(
             .padding(
                 horizontal = 8.dp,
                 vertical = 8.dp,
-            ),
+            ).then(modifier),
         border = border,
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
