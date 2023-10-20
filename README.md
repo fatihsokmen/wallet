@@ -18,3 +18,4 @@
 - Gas fee should be updated after a time span. (ex: 5 sec), however in the example, app fetches most recent fee data on each input (after dobounce()).
 - Swicthing input mode: ETH input should start from exchanged amount. In the example coide, app keep existing input value.
 - After too many calls, api rejects request. App shows a snackbar however ux can be improved.
+- Landspace mode may have another design, with regards to `Send` button
