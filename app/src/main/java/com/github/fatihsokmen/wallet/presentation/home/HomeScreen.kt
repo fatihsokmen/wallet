@@ -1,12 +1,8 @@
-@file:OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
-    ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class
-)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.github.fatihsokmen.wallet.presentation.home
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -306,7 +302,9 @@ private fun CurrencyTextField(
                     .weight(1f)
             ) {
                 Row(
-                    modifier = Modifier.align(Alignment.CenterStart).testTag("currency-symbol")
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .testTag("currency-symbol")
                 ) {
                     val symbol = if (inputMode == InputMode.FIAT_TO_ETH) {
                         currency.symbol
@@ -345,7 +343,9 @@ private fun CurrencyTextField(
                 }
                 if (inputMode.isFiatToEth()) {
                     Text(
-                        modifier = Modifier.align(Alignment.BottomStart).testTag("exp-amount-text"),
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .testTag("exp-amount-text"),
                         text = stringResource(
                             R.string.home_exchange_conversion_eth_text,
                             ethAmount
@@ -368,7 +368,9 @@ private fun CurrencyTextField(
                 )
                 if (inputMode.isFiatToEth()) {
                     InputChip(
-                        modifier = Modifier.align(Alignment.CenterStart).testTag("currency-chip"),
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .testTag("currency-chip"),
                         selected = false,
                         onClick = onOpenCurrencySelector,
                         border = null,
@@ -456,7 +458,8 @@ fun CurrencyItem(
             .padding(
                 horizontal = 8.dp,
                 vertical = 8.dp,
-            ).then(modifier),
+            )
+            .then(modifier),
         border = border,
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
