@@ -27,7 +27,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -36,14 +35,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedIconButton
-import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +56,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -87,24 +87,15 @@ fun HomeScreen(
         )
     )
 
-    val sheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.Hidden,
-        skipHiddenState = false
-    )
+    val sheetState = rememberModalBottomSheetState()
 
     val scope = rememberCoroutineScope()
 
-    BottomSheetScaffold(
-        modifier = Modifier.fillMaxHeight(),
-        scaffoldState = rememberBottomSheetScaffoldState(sheetState),
-        sheetPeekHeight = 0.dp,
-        sheetContent = {
-            CurrencyList(
-                current = uiState.currency,
-                onDismiss = { scope.launch { sheetState.hide() } },
-                onNewCurrency = viewModel::onNewFiat
-            )
-        }) { padding ->
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    val focusManager = LocalFocusManager.current
+
+    Scaffold(modifier = Modifier.fillMaxHeight()) { padding ->
         HomeContent(
             modifier = Modifier.padding(padding),
             ethAmount = uiState.ethAmount,
@@ -126,7 +117,11 @@ fun HomeScreen(
             walletBalance = HomeViewModel.WALLET_ETH_BALANCE,
             inputMode = uiState.inputMode,
             onInputAmountChanged = viewModel::onNewAmount,
-            onOpenCurrencySelector = { scope.launch { sheetState.expand() } },
+            onOpenCurrencySelector = {
+                scope.launch {
+                    focusManager.clearFocus().also { showBottomSheet = true }
+                }
+                                     },
             onRotate = viewModel::onSwitchInputModel,
             snackbar = {
                 val errorState by viewModel.errorState
@@ -142,6 +137,23 @@ fun HomeScreen(
                 }
             }
         )
+
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+                sheetState = sheetState
+            ) {
+                CurrencyList(
+                    current = uiState.currency,
+                    onDismiss = { scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            showBottomSheet = false
+                        }
+                    } },
+                    onNewCurrency = viewModel::onNewFiat
+                )
+            }
+        }
     }
 }
 
