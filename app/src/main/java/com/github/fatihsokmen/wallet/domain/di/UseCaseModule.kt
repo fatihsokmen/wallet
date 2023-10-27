@@ -4,6 +4,8 @@ import com.github.fatihsokmen.wallet.domain.CalculateEthereumAmountInFiatCurrenc
 import com.github.fatihsokmen.wallet.domain.CalculateEthereumAmountInFiatCurrencyUseCaseImpl
 import com.github.fatihsokmen.wallet.domain.CalculateEthereumGasFeeUseCase
 import com.github.fatihsokmen.wallet.domain.CalculateEthereumGasFeeUseCaseImpl
+import com.github.fatihsokmen.wallet.domain.CalculateFiatPriceByGivenEthereumUseCase
+import com.github.fatihsokmen.wallet.domain.CalculateFiatPriceByGivenEthereumUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -17,6 +19,11 @@ interface UseCaseModule {
     fun bindsEthereumAmountUseCase(
         repository: CalculateEthereumAmountInFiatCurrencyUseCaseImpl
     ): CalculateEthereumAmountInFiatCurrencyUseCase
+
+    @Binds
+    fun bindsFiatPriceUseCase(
+        repository: CalculateFiatPriceByGivenEthereumUseCaseImpl
+    ): CalculateFiatPriceByGivenEthereumUseCase
 
     @Binds
     fun bindsEthereumGasFeeUseCase(

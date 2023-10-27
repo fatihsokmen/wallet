@@ -7,18 +7,32 @@ import com.github.fatihsokmen.wallet.R
 import com.github.fatihsokmen.wallet.core.StringResources
 import com.github.fatihsokmen.wallet.domain.CalculateEthereumAmountInFiatCurrencyUseCase
 import com.github.fatihsokmen.wallet.domain.CalculateEthereumGasFeeUseCase
+import com.github.fatihsokmen.wallet.domain.CalculateFiatPriceByGivenEthereumUseCase
 import com.github.fatihsokmen.wallet.presentation.home.model.Currency
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.math.BigDecimal
 import javax.inject.Inject
@@ -27,6 +41,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val calculateEthereumAmountUseCase: CalculateEthereumAmountInFiatCurrencyUseCase,
+    private val calculateFiatPriceByGivenEthereumUseCase: CalculateFiatPriceByGivenEthereumUseCase,
     private val calculateEthereumGasFee: CalculateEthereumGasFeeUseCase,
     private val stringResources: StringResources
 ) : ViewModel() {
@@ -97,6 +112,10 @@ class HomeViewModel @Inject constructor(
 
     val errorState = mutableStateOf("")
 
+    val bottomSheetState = mutableStateOf(BottomSheetState(ethAmount = BigDecimal.ZERO))
+
+    private var bottomSheetLoadTask: Job? = null
+
     fun onNewAmount(value: String) {
         inputAmount.tryEmit(value)
     }
@@ -108,6 +127,49 @@ class HomeViewModel @Inject constructor(
 
     fun onSwitchInputModel(newExchange: InputMode) {
         this.inputMode.tryEmit(newExchange)
+    }
+
+    fun onLoadCurrencies(ethAmount: BigDecimal) {
+        bottomSheetState.value = BottomSheetState(ethAmount = ethAmount)
+
+        bottomSheetLoadTask?.cancel()
+        bottomSheetLoadTask = viewModelScope.launch {
+            combine(
+                calculateFiatPriceByGivenEthereumUseCase.execute(Currency.EUR, ethAmount),
+                calculateFiatPriceByGivenEthereumUseCase.execute(Currency.USD, ethAmount),
+                calculateFiatPriceByGivenEthereumUseCase.execute(Currency.GBP, ethAmount)
+            ) { eur, usd, gbp ->
+                delay(4000)
+                BottomSheetState(
+                    ethAmount = ethAmount,
+                    currencies = listOf(
+                        CurrencyState(
+                            Currency.EUR,
+                            eur.fold(
+                                onSuccess = { CurrencyStatus.Loaded(it) },
+                                onFailure = { CurrencyStatus.Failed("Error") }
+                            )
+                        ),
+                        CurrencyState(
+                            Currency.USD,
+                            usd.fold(
+                                onSuccess = { CurrencyStatus.Loaded(it) },
+                                onFailure = { CurrencyStatus.Failed("Error") }
+                            )
+                        ),
+                        CurrencyState(
+                            Currency.GBP,
+                            gbp.fold(
+                                onSuccess = { CurrencyStatus.Loaded(it) },
+                                onFailure = { CurrencyStatus.Failed("Error") }
+                            ))
+                    )
+                )
+
+            }.flowOn(Dispatchers.IO).collect() {
+                bottomSheetState.value = it
+            }
+        }
     }
 
     fun clearError() {
@@ -148,3 +210,29 @@ data class UiState(
     val errorMessage: String? = null
 )
 
+data class BottomSheetState(
+    val ethAmount: BigDecimal,
+    val currencies: List<CurrencyState> = listOf(
+        CurrencyState(
+            Currency.EUR, CurrencyStatus.Loading
+        ),
+        CurrencyState(
+            Currency.USD, CurrencyStatus.Loading
+        ),
+        CurrencyState(
+            Currency.GBP, CurrencyStatus.Loading
+        )
+    ),
+    val success: Boolean = true
+)
+
+data class CurrencyState(
+    val currency: Currency,
+    val status: CurrencyStatus
+)
+
+sealed class CurrencyStatus {
+    data object Loading : CurrencyStatus()
+    data class Failed(val message: String) : CurrencyStatus()
+    data class Loaded(val price: BigDecimal) : CurrencyStatus()
+}

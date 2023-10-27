@@ -9,7 +9,8 @@ import com.github.fatihsokmen.wallet.R
 enum class Currency(
     val symbol: String,
     val displayName: String,
-    @DrawableRes val flag: Int
+    @DrawableRes val flag: Int,
+    val price: String = "0"
 ) {
     EUR(symbol = "€", "Euros", R.drawable.eur),
     USD(symbol = "$", "Dollars", R.drawable.usd),

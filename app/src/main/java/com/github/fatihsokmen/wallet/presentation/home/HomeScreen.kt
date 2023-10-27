@@ -63,12 +63,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.fatihsokmen.wallet.R
 import com.github.fatihsokmen.wallet.presentation.home.model.Currency
+import com.github.fatihsokmen.wallet.ui.widget.ShimmerAnimation
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -126,6 +128,7 @@ fun HomeScreen(
             onOpenCurrencySelector = {
                 scope.launch {
                     focusManager.clearFocus().also { showBottomSheet = true }
+                    viewModel.onLoadCurrencies(uiState.ethAmount)
                 }
             },
             onRotate = viewModel::onSwitchInputModel,
@@ -151,6 +154,7 @@ fun HomeScreen(
             ) {
                 CurrencyList(
                     current = uiState.currency,
+                    bottomSheetState = viewModel.bottomSheetState.value,
                     onDismiss = {
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
@@ -439,6 +443,7 @@ private fun CurrencyTextField(
 @Composable
 fun CurrencyList(
     current: Currency,
+    bottomSheetState: BottomSheetState,
     onNewCurrency: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -458,16 +463,19 @@ fun CurrencyList(
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Medium,
         )
-        val currencies = Currency.entries
+        val currencyStates = bottomSheetState.currencies
         LazyColumn {
-            items(currencies.size) {
-                val currency = currencies[it]
+            items(currencyStates.size) {
+                val state = currencyStates[it]
                 CurrencyItem(
-                    modifier = Modifier.testTag("${currency.name}-option"),
-                    displayName = currency.displayName,
-                    code = currency.name,
-                    flag = currency.flag,
-                    selected = current == currency,
+                    modifier = Modifier.testTag("${state.currency.name}-option"),
+                    displayName = state.currency.displayName,
+                    symbol = state.currency.symbol,
+                    code = state.currency.name,
+                    flag = state.currency.flag,
+                    selected = current == state.currency,
+                    ethAmount = bottomSheetState.ethAmount.toString(),
+                    status = state.status,
                     onNewCurrency = onNewCurrency,
                     onDismiss = onDismiss
                 )
@@ -483,9 +491,12 @@ fun CurrencyList(
 fun CurrencyItem(
     modifier: Modifier,
     displayName: String,
+    symbol: String,
     code: String,
     @DrawableRes flag: Int,
     selected: Boolean,
+    ethAmount: String,
+    status: CurrencyStatus,
     onNewCurrency: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -528,13 +539,54 @@ fun CurrencyItem(
                 Text(text = displayName, fontWeight = FontWeight.Medium)
                 Text(text = code, fontWeight = FontWeight.Normal)
             }
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp),
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(text = "234.50", fontWeight = FontWeight.Medium)
-                Text(text = "$67", fontWeight = FontWeight.Normal)
+            when (status) {
+                CurrencyStatus.Loading -> {
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp),
+                        horizontalAlignment = Alignment.End
+
+                    ) {
+                        Text(text = ethAmount, fontWeight = FontWeight.Medium)
+                        ShimmerAnimation { brush ->
+                            Box(
+                                Modifier
+                                    .width(48.dp)
+                                    .height(20.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(brush)
+                            )
+                        }
+                    }
+                }
+
+                is CurrencyStatus.Failed -> {
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp),
+                        horizontalAlignment = Alignment.End
+
+                    ) {
+                        Text(text = ethAmount, fontWeight = FontWeight.Medium)
+                        Text(
+                            text = status.message,
+                            fontWeight = FontWeight.Normal,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                is CurrencyStatus.Loaded -> {
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp),
+                        horizontalAlignment = Alignment.End
+
+                    ) {
+                        Text(text = ethAmount, fontWeight = FontWeight.Medium)
+                        Text(text = "$symbol${status.price}", fontWeight = FontWeight.Normal)
+                    }
+                }
             }
         }
     }
