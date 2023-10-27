@@ -361,7 +361,9 @@ private fun CurrencyTextField(
                 modifier = Modifier.fillMaxHeight()
             ) {
                 Text(
-                    modifier = Modifier.align(Alignment.TopStart),
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(end = 32.dp),
                     text = stringResource(R.string.home_wallet_balance_eth, walletBalance),
                     color = Color.Blue,
                     style = MaterialTheme.typography.labelMedium,
@@ -518,9 +520,21 @@ fun CurrencyItem(
                     .size(36.dp)
                     .align(Alignment.CenterVertically)
             )
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .weight(1f)
+            ) {
                 Text(text = displayName, fontWeight = FontWeight.Medium)
                 Text(text = code, fontWeight = FontWeight.Normal)
+            }
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(text = "234.50", fontWeight = FontWeight.Medium)
+                Text(text = "$67", fontWeight = FontWeight.Normal)
             }
         }
     }
