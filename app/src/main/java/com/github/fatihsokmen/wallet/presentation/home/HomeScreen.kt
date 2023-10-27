@@ -7,7 +7,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +26,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -63,8 +63,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.fatihsokmen.wallet.R
@@ -127,7 +127,7 @@ fun HomeScreen(
                 scope.launch {
                     focusManager.clearFocus().also { showBottomSheet = true }
                 }
-                                     },
+            },
             onRotate = viewModel::onSwitchInputModel,
             snackbar = {
                 val errorState by viewModel.errorState
@@ -151,11 +151,13 @@ fun HomeScreen(
             ) {
                 CurrencyList(
                     current = uiState.currency,
-                    onDismiss = { scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            showBottomSheet = false
+                    onDismiss = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                showBottomSheet = false
+                            }
                         }
-                    } },
+                    },
                     onNewCurrency = viewModel::onNewFiat
                 )
             }
@@ -188,17 +190,21 @@ fun HomeContent(
         )
         Text(
             modifier = Modifier
-                .fillMaxWidth(fraction = 0.85f)
+                .fillMaxWidth(fraction = 0.92f)
+                .padding(
+                    start = 24.dp,
+                    top = dimensionResource(id = R.dimen.home_title_top_padding),
+                    bottom = dimensionResource(id = R.dimen.home_title_bottom_padding),
+                    end = 24.dp
+                )
                 .align(Alignment.CenterHorizontally),
             text = stringResource(R.string.home_title_send_ethereum),
-            style = MaterialTheme.typography.displaySmall
-        )
-        Spacer(
-            modifier = Modifier.height(dimensionResource(id = R.dimen.home_title_bottom_padding))
+            style = MaterialTheme.typography.displaySmall.copy(fontSize = 30.sp)
         )
         CurrencyTextField(
             modifier = Modifier
-                .fillMaxWidth(fraction = 0.85f)
+                .fillMaxWidth(fraction = 0.92f)
+                .padding(end = 8.dp)
                 .align(Alignment.CenterHorizontally)
                 .height(dimensionResource(id = R.dimen.home_input_height)),
             ethAmount = ethAmount,
@@ -212,20 +218,30 @@ fun HomeContent(
         Spacer(
             modifier = Modifier.height(16.dp)
         )
-        Text(
+        Row(
             modifier = Modifier
-                .fillMaxWidth(fraction = 0.70f)
-                .align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.home_exchange_est_network_fees_eth, ethGasFee),
-            style = MaterialTheme.typography.labelLarge
-        )
+                .fillMaxWidth(fraction = 0.92f)
+                .padding(start = 24.dp)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Info,
+                contentDescription = "Estimated gas fee",
+                modifier = Modifier.padding(end = 8.dp)
+            )
+            Text(
+                modifier = Modifier.weight(1f),
+                text = stringResource(R.string.home_exchange_est_network_fees_eth, ethGasFee),
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
         Spacer(
             modifier = Modifier.weight(1f)
         )
         Button(
             enabled = buttonEnabled,
             modifier = Modifier
-                .fillMaxWidth(fraction = 0.8f)
+                .fillMaxWidth(fraction = 0.85f)
                 .align(alignment = Alignment.CenterHorizontally)
                 .height(64.dp),
             shape = RoundedCornerShape(16),
@@ -255,9 +271,8 @@ private fun CurrencyTextField(
     onOpenCurrencySelector: () -> Unit,
     onRotate: (InputMode) -> Unit
 ) {
-    CurrencyFrame(
-        modifier = modifier,
-        startMargin = 24.dp
+    CurrencyLayout(
+        modifier = modifier
     ) {
         OutlinedCard(
             modifier = Modifier.fillMaxSize(),
@@ -270,47 +285,12 @@ private fun CurrencyTextField(
                 defaultElevation = 6.dp
             )
         ) {}
+
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 16.dp, bottom = 16.dp, end = 16.dp)
+                .padding(top = 8.dp, bottom = 16.dp)
         ) {
-            Surface(
-                modifier = Modifier
-                    .size(width = 48.dp, height = 48.dp)
-                    .clip(CircleShape)
-                    .border(BorderStroke(1.dp, Color.Gray))
-                    .align(Alignment.CenterVertically),
-                shadowElevation = 4.dp
-            ) {
-                val rotation = remember { Animatable(0f) }
-                val coroutineScope = rememberCoroutineScope()
-                OutlinedIconButton(
-                    modifier = Modifier
-                        .padding(0.dp)
-                        .background(Color.White)
-                        .testTag("input-mode")
-                        .align(alignment = Alignment.CenterVertically),
-                    onClick = {
-                        val (target, mode) = if (rotation.value == 0f) {
-                            Pair(180f, InputMode.ETH_ONLY)
-                        } else {
-                            Pair(0f, InputMode.FIAT_TO_ETH)
-                        }
-                        coroutineScope.launch {
-                            rotation.animateTo(target)
-                            onRotate(mode)
-                        }
-                    },
-                ) {
-                    Icon(
-                        modifier = Modifier.rotate(rotation.value),
-                        painter = painterResource(id = R.drawable.ic_change),
-                        contentDescription = null,
-                        tint = Color.DarkGray
-                    )
-                }
-            }
             Spacer(
                 modifier = Modifier.width(16.dp)
             )
@@ -330,7 +310,8 @@ private fun CurrencyTextField(
                         stringResource(R.string.home_input_eth_symbol)
                     }
                     Text(
-                        text = symbol, style = MaterialTheme.typography.headlineMedium
+                        text = symbol,
+                        style = MaterialTheme.typography.headlineSmall.copy(fontSize = 22.sp)
                     )
                     Spacer(
                         modifier = Modifier.width(4.dp)
@@ -343,7 +324,7 @@ private fun CurrencyTextField(
                         value = inputAmountState,
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        textStyle = MaterialTheme.typography.headlineMedium,
+                        textStyle = MaterialTheme.typography.headlineSmall.copy(fontSize = 22.sp),
                         onValueChange = {
                             inputAmountState = it
                             onInputAmountChanged(it)
@@ -352,7 +333,7 @@ private fun CurrencyTextField(
                             if (inputAmountState.isEmpty()) {
                                 Text(
                                     stringResource(R.string.home_currency_input_empty_value),
-                                    style = MaterialTheme.typography.headlineMedium
+                                    style = MaterialTheme.typography.headlineSmall.copy(fontSize = 22.sp)
                                 )
                             }
                             innerTextField()
@@ -369,6 +350,7 @@ private fun CurrencyTextField(
                             ethAmount
                         ),
                         color = Color.Gray.copy(alpha = 0.6f),
+                        style = MaterialTheme.typography.headlineSmall.copy(fontSize = 14.sp),
                     )
                 }
             }
@@ -382,7 +364,7 @@ private fun CurrencyTextField(
                     modifier = Modifier.align(Alignment.TopStart),
                     text = stringResource(R.string.home_wallet_balance_eth, walletBalance),
                     color = Color.Blue,
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelMedium,
                 )
                 if (inputMode.isFiatToEth()) {
                     InputChip(
@@ -411,6 +393,44 @@ private fun CurrencyTextField(
                 }
             }
         }
+
+        Box {
+            Surface(
+                modifier = Modifier
+                    .size(width = 48.dp, height = 48.dp)
+                    .clip(CircleShape)
+                    .align(Alignment.CenterStart),
+                shadowElevation = 4.dp
+            ) {
+                val rotation = remember { Animatable(0f) }
+                val coroutineScope = rememberCoroutineScope()
+                OutlinedIconButton(
+                    modifier = Modifier
+                        .padding(0.dp)
+                        .background(Color.White)
+                        .testTag("input-mode"),
+                    border = BorderStroke(1.dp, Color.LightGray),
+                    onClick = {
+                        val (target, mode) = if (rotation.value == 0f) {
+                            Pair(180f, InputMode.ETH_ONLY)
+                        } else {
+                            Pair(0f, InputMode.FIAT_TO_ETH)
+                        }
+                        coroutineScope.launch {
+                            rotation.animateTo(target)
+                            onRotate(mode)
+                        }
+                    },
+                ) {
+                    Icon(
+                        modifier = Modifier.rotate(rotation.value),
+                        painter = painterResource(id = R.drawable.ic_change),
+                        contentDescription = null,
+                        tint = Color.DarkGray
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -423,16 +443,18 @@ fun CurrencyList(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Text(
             modifier = Modifier.padding(
-                horizontal = 8.dp,
-                vertical = 16.dp,
+                start = 8.dp,
+                end = 8.dp,
+                bottom = 32.dp,
+                top = 8.dp
             ),
             text = stringResource(R.string.home_bottom_shet_displayed_currencies),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Black,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Medium,
         )
         val currencies = Currency.entries
         LazyColumn {
@@ -466,9 +488,9 @@ fun CurrencyItem(
     onDismiss: () -> Unit
 ) {
     val border = if (selected) {
-        BorderStroke(2.dp, Color.Black)
+        BorderStroke(2.dp, Color.DarkGray)
     } else {
-        BorderStroke(1.dp, Color.Gray)
+        BorderStroke(1.dp, Color.LightGray)
     }
     OutlinedCard(
         modifier = Modifier
@@ -479,7 +501,7 @@ fun CurrencyItem(
             )
             .then(modifier),
         border = border,
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(5.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
         ),
@@ -493,12 +515,12 @@ fun CurrencyItem(
                 painterResource(id = flag),
                 contentDescription = code,
                 Modifier
-                    .size(InputChipDefaults.AvatarSize)
+                    .size(36.dp)
                     .align(Alignment.CenterVertically)
             )
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                Text(text = displayName, fontWeight = FontWeight.Black)
-                Text(text = code, fontWeight = FontWeight.Light)
+                Text(text = displayName, fontWeight = FontWeight.Medium)
+                Text(text = code, fontWeight = FontWeight.Normal)
             }
         }
     }
@@ -513,7 +535,7 @@ fun CurrencyInfo() {
                 horizontal = 8.dp,
                 vertical = 16.dp,
             ),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(5.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         )
@@ -533,8 +555,7 @@ fun CurrencyInfo() {
 }
 
 @Composable
-fun CurrencyFrame(
-    startMargin: Dp,
+fun CurrencyLayout(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
@@ -544,24 +565,33 @@ fun CurrencyFrame(
     ) { measurables, constraints ->
         val frame = measurables[0]
         val body = measurables[1]
+        val switch = measurables[2]
         val looseConstraints = constraints.copy(
             minWidth = 0,
             minHeight = 0,
         )
-        val framePlaceable =
-            frame.measure(looseConstraints.copy(maxWidth = looseConstraints.maxWidth - startMargin.roundToPx()))
-        val bodyPlaceable = body.measure(looseConstraints)
+        val switchPlaceable = switch.measure(looseConstraints)
+        val framePlaceable = frame.measure(
+            looseConstraints.copy(maxWidth = looseConstraints.maxWidth - switchPlaceable.width / 2)
+        )
+        val bodyPlaceable = body.measure(
+            looseConstraints.copy(maxWidth = looseConstraints.maxWidth - switchPlaceable.width)
+        )
         layout(
             width = constraints.maxWidth,
             height = framePlaceable.height
         ) {
             framePlaceable.placeRelative(
-                x = startMargin.roundToPx(),
+                x = switchPlaceable.width / 2,
                 y = 0,
             )
             bodyPlaceable.placeRelative(
-                x = 0,
+                x = switchPlaceable.width,
                 y = 0
+            )
+            switchPlaceable.placeRelative(
+                x = 0,
+                y = (framePlaceable.height - switchPlaceable.height) / 2,
             )
         }
     }

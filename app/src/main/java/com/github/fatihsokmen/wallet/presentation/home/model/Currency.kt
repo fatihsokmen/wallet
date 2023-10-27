@@ -11,7 +11,7 @@ enum class Currency(
     val displayName: String,
     @DrawableRes val flag: Int
 ) {
-    USD(symbol = "$", "Dollars", R.drawable.usd),
     EUR(symbol = "€", "Euros", R.drawable.eur),
+    USD(symbol = "$", "Dollars", R.drawable.usd),
     GBP(symbol = "£", "Pounds", R.drawable.gbp)
 }
