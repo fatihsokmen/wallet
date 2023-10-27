@@ -72,6 +72,8 @@ dependencies {
     implementation(libs.material3)
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
+    implementation(libs.accompanist.uicontroller)
+
 
     // Networking
     implementation(libs.retrofit)

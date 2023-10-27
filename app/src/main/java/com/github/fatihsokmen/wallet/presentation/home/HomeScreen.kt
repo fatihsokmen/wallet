@@ -69,6 +69,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.fatihsokmen.wallet.R
 import com.github.fatihsokmen.wallet.presentation.home.model.Currency
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
@@ -76,6 +77,11 @@ import java.math.BigDecimal
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setSystemBarsColor(
+        color = MaterialTheme.colorScheme.background
+    )
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle(
         UiState(
             userInput = BigDecimal.ZERO.toString(),
@@ -140,8 +146,8 @@ fun HomeScreen(
 
         if (showBottomSheet) {
             ModalBottomSheet(
-                onDismissRequest = { showBottomSheet = false },
-                sheetState = sheetState
+                sheetState = sheetState,
+                onDismissRequest = { showBottomSheet = false }
             ) {
                 CurrencyList(
                     current = uiState.currency,
