@@ -9,11 +9,12 @@
     <string name="home_wallet_balance_eth">Max %1$s ETH</string>
     <string name="home_currency_flag">Currency</string>
     <string name="home_currency_select">Select</string>
-    <string name="home_bottom_shet_displayed_currencies">Displayed Currencies</string>
+    <string name="home_bottom_sheet_displayed_currencies">Displayed Currencies</string>
     <string name="home_bottom_sheet_info">The currency is for information only. You\'re still sending ETH</string>
     <string name="home_exchange_conversion_eth_text">%1$s ETH</string>
     <string name="home_input_eth_symbol">ETH</string>
     <string name="home_error_internet_connection">Please check your connection</string>
     <string name="home_error_generic">An error occurred</string>
+    <string name="home_bottom_sheet_retry_again">Retry again</string>
 </resources>
 

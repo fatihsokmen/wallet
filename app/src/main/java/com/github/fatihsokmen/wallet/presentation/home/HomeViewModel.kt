@@ -18,20 +18,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.math.BigDecimal
@@ -126,7 +119,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onSwitchInputModel(newExchange: InputMode) {
-        this.inputMode.tryEmit(newExchange)
+        inputMode.tryEmit(newExchange)
     }
 
     fun onLoadCurrencies(ethAmount: BigDecimal) {
@@ -147,21 +140,21 @@ class HomeViewModel @Inject constructor(
                             Currency.EUR,
                             eur.fold(
                                 onSuccess = { CurrencyStatus.Loaded(it) },
-                                onFailure = { CurrencyStatus.Failed("Error") }
+                                onFailure = { CurrencyStatus.Failed(stringResources.getString(R.string.home_bottom_sheet_retry_again)) }
                             )
                         ),
                         CurrencyState(
                             Currency.USD,
                             usd.fold(
                                 onSuccess = { CurrencyStatus.Loaded(it) },
-                                onFailure = { CurrencyStatus.Failed("Error") }
+                                onFailure = { CurrencyStatus.Failed(stringResources.getString(R.string.home_bottom_sheet_retry_again)) }
                             )
                         ),
                         CurrencyState(
                             Currency.GBP,
                             gbp.fold(
                                 onSuccess = { CurrencyStatus.Loaded(it) },
-                                onFailure = { CurrencyStatus.Failed("Error") }
+                                onFailure = { CurrencyStatus.Failed(stringResources.getString(R.string.home_bottom_sheet_retry_again)) }
                             ))
                     )
                 )

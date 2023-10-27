@@ -459,7 +459,7 @@ fun CurrencyList(
                 bottom = 32.dp,
                 top = 8.dp
             ),
-            text = stringResource(R.string.home_bottom_shet_displayed_currencies),
+            text = stringResource(R.string.home_bottom_sheet_displayed_currencies),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Medium,
         )
