@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.github.fatihsokmen.wallet.core.StringResources
 import com.github.fatihsokmen.wallet.domain.CalculateEthereumAmountInFiatCurrencyUseCase
 import com.github.fatihsokmen.wallet.domain.CalculateEthereumGasFeeUseCase
+import com.github.fatihsokmen.wallet.domain.CalculateFiatPriceByGivenEthereumUseCase
 import com.github.fatihsokmen.wallet.presentation.MainDispatcherRule
 import com.github.fatihsokmen.wallet.presentation.home.model.Currency
 import io.kotest.matchers.shouldBe
@@ -21,6 +22,8 @@ class HomeViewModelTest {
 
     private val calculateEthereumAmountUseCase: CalculateEthereumAmountInFiatCurrencyUseCase =
         mockk(relaxed = true)
+    private val calculateFiatPriceByGivenEthereumUseCase: CalculateFiatPriceByGivenEthereumUseCase
+        = mockk(relaxed = true)
     private val calculateEthereumGasFee: CalculateEthereumGasFeeUseCase =
         mockk(relaxed = true)
     private val stringResource: StringResources = mockk(relaxed = true)
@@ -35,6 +38,7 @@ class HomeViewModelTest {
             // WHEN
             val subject = HomeViewModel(
                 calculateEthereumAmountUseCase,
+                calculateFiatPriceByGivenEthereumUseCase,
                 calculateEthereumGasFee,
                 stringResource
             )
@@ -63,6 +67,7 @@ class HomeViewModelTest {
             // WHEN
             val subject = HomeViewModel(
                 calculateEthereumAmountUseCase,
+                calculateFiatPriceByGivenEthereumUseCase,
                 calculateEthereumGasFee,
                 stringResource
             )
@@ -92,6 +97,7 @@ class HomeViewModelTest {
             // WHEN
             val subject = HomeViewModel(
                 calculateEthereumAmountUseCase,
+                calculateFiatPriceByGivenEthereumUseCase,
                 calculateEthereumGasFee,
                 stringResource
             )
@@ -120,6 +126,7 @@ class HomeViewModelTest {
             // WHEN
             val subject = HomeViewModel(
                 calculateEthereumAmountUseCase,
+                calculateFiatPriceByGivenEthereumUseCase,
                 calculateEthereumGasFee,
                 stringResource
             )
@@ -150,6 +157,7 @@ class HomeViewModelTest {
             // WHEN
             val subject = HomeViewModel(
                 calculateEthereumAmountUseCase,
+                calculateFiatPriceByGivenEthereumUseCase,
                 calculateEthereumGasFee,
                 stringResource
             )
