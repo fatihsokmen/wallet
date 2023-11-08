@@ -1,4 +1,4 @@
-# Deblock Wallet
+# Crypto Wallet App
 
 ## Tools / Env.
 
